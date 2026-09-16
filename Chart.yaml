@@ -1,0 +1,22 @@
+apiVersion: v2
+name: aks-3tier-poc
+description: Secure 3-tier application POC for Azure Kubernetes Service
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: frontend
+    version: 1.0.0
+    repository: "file://charts/frontend"
+    condition: frontend.enabled
+
+  - name: api
+    version: 1.0.0
+    repository: "file://charts/api"
+    condition: api.enabled
+
+  - name: postgres
+    version: 1.0.0
+    repository: "file://charts/postgres"
+    condition: postgres.enabled

@@ -1,0 +1,25 @@
+enabled: true
+image:
+  repository: node
+  tag: alpine
+  pullPolicy: IfNotPresent
+replicaCount: 2
+service:
+  type: ClusterIP
+  port: 3000
+serviceAccount:
+  create: true
+  name: api
+  clientId: ""
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+env:
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  DB_NAME: appdb
+  DB_USER: appuser

@@ -1,0 +1,17 @@
+enabled: true
+image:
+  repository: postgres
+  tag: "16-alpine"
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 5432
+storage:
+  size: 8Gi
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

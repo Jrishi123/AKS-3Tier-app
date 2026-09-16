@@ -1,0 +1,12 @@
+.DS_Store
+*.log
+.env
+.env.*
+.kube/
+secrets/
+*.key
+*.pem
+*.crt
+*.p12
+node_modules/
+dist/
