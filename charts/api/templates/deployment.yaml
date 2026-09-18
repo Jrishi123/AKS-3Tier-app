@@ -22,57 +22,60 @@ spec:
         azure.workload.identity/use: "true"
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
+
       containers:
         - name: api
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+
           ports:
             - name: http
               containerPort: 3000
+
           env:
             - name: DB_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: api-db-secrets
-                  key: DB_HOST
+              value: {{ .Values.env.DB_HOST | quote }}
+
             - name: DB_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: api-db-secrets
-                  key: DB_PORT
+              value: {{ .Values.env.DB_PORT | quote }}
+
             - name: DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: api-db-secrets
-                  key: DB_NAME
+              value: {{ .Values.env.DB_NAME | quote }}
+
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
                   name: api-db-secrets
                   key: DB_USER
+
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: api-db-secrets
                   key: DB_PASSWORD
+
           volumeMounts:
             - name: secrets-store
               mountPath: /mnt/secrets-store
               readOnly: true
+
           readinessProbe:
             httpGet:
               path: /health
               port: http
             initialDelaySeconds: 5
             periodSeconds: 10
+
           livenessProbe:
             httpGet:
               path: /health
               port: http
             initialDelaySeconds: 10
             periodSeconds: 20
+
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+
       volumes:
         - name: secrets-store
           csi:

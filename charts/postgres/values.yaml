@@ -1,4 +1,8 @@
 enabled: true
+serviceAccount:
+  create: true
+  name: postgres
+  clientId: 328a78e4-013c-4eaa-950d-15da6caf0994
 image:
   repository: postgres
   tag: "16-alpine"

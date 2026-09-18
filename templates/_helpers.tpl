@@ -34,5 +34,5 @@ Global ingress paths.
 {{- end -}}
 
 {{- define "aks-3tier-poc.apiPath" -}}
-/api
+/api(/|$)(.*)
 {{- end -}}

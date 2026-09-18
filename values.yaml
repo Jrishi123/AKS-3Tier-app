@@ -2,15 +2,15 @@ global:
   domain: app.example.com
 
   keyVault:
-    name: CHANGE_ME_KEYVAULT
-    tenantId: CHANGE_ME_TENANT_ID
-    clientId: CHANGE_ME_API_MANAGED_IDENTITY_CLIENT_ID
+    name: kvsecure3tier1789734694
+    tenantId: 6fead228-c63b-47cb-8a02-5f1a47d082d0
+    clientId: eb874a25-588d-4f6c-a164-6d2f4f91b046
 
 frontend:
   enabled: true
 
   image:
-    repository: CHANGE_ME_ACR.azurecr.io/aks-3tier-frontend
+    repository: acrsecure3tierv21789745065.azurecr.io/aks-3tier-frontend
     tag: "1.0.0"
     pullPolicy: IfNotPresent
 
@@ -32,7 +32,7 @@ api:
   enabled: true
 
   image:
-    repository: CHANGE_ME_ACR.azurecr.io/aks-3tier-api
+    repository: acrsecure3tierv21789745065.azurecr.io/aks-3tier-api
     tag: "1.0.0"
     pullPolicy: IfNotPresent
 
@@ -45,7 +45,7 @@ api:
   serviceAccount:
     create: true
     name: api
-    clientId: CHANGE_ME_API_MANAGED_IDENTITY_CLIENT_ID
+    clientId: eb874a25-588d-4f6c-a164-6d2f4f91b046
 
   resources:
     requests:
@@ -56,7 +56,7 @@ api:
       memory: 512Mi
 
   env:
-    DB_HOST: postgres
+    DB_HOST: secure3tier-postgres
     DB_PORT: "5432"
     DB_NAME: appdb
     DB_USER: appuser
@@ -87,20 +87,25 @@ postgres:
 ingress:
   enabled: true
   className: nginx
+
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 
 tls:
-  enabled: true
+  enabled: false
   secretName: app-tls
   clusterIssuer: letsencrypt-prod
 
 migration:
   enabled: true
+
   image:
     repository: node
     tag: "22-alpine"
+
   resources:
     requests:
       cpu: 50m

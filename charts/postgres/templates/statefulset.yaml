@@ -1,3 +1,4 @@
+{{- if .Values.enabled }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -6,44 +7,61 @@ metadata:
     app.kubernetes.io/name: postgres
     app.kubernetes.io/component: postgres
     app.kubernetes.io/instance: {{ .Release.Name }}
+
 spec:
   serviceName: {{ include "postgres.fullname" . }}
   replicas: 1
+
   selector:
     matchLabels:
       app.kubernetes.io/name: postgres
       app.kubernetes.io/component: postgres
       app.kubernetes.io/instance: {{ .Release.Name }}
+
   template:
     metadata:
       labels:
         app.kubernetes.io/name: postgres
         app.kubernetes.io/component: postgres
         app.kubernetes.io/instance: {{ .Release.Name }}
+        azure.workload.identity/use: "true"
+
     spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+
       containers:
         - name: postgres
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+
           ports:
             - name: postgres
               containerPort: 5432
+
           env:
             - name: POSTGRES_DB
               value: appdb
+
             - name: POSTGRES_USER
               value: appuser
+
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: postgres-bootstrap
                   key: POSTGRES_PASSWORD
+  
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
+
             - name: secrets-store
               mountPath: /mnt/secrets-store
               readOnly: true
+
           readinessProbe:
             exec:
               command:
@@ -52,6 +70,7 @@ spec:
                 - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
             initialDelaySeconds: 10
             periodSeconds: 10
+
           livenessProbe:
             exec:
               command:
@@ -60,8 +79,18 @@ spec:
                 - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
             initialDelaySeconds: 30
             periodSeconds: 20
+
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ printf "%s-postgres-bootstrap" .Release.Name | quote }}
+
   volumeClaimTemplates:
     - metadata:
         name: postgres-data
@@ -71,3 +100,4 @@ spec:
         resources:
           requests:
             storage: {{ .Values.storage.size }}
+{{- end }}
