@@ -2,34 +2,38 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "aks-3tier-poc.fullname" . }}
+  name: {{ .Release.Name }}
   labels:
     {{- include "aks-3tier-poc.labels" . | nindent 4 }}
   annotations:
     {{- toYaml .Values.ingress.annotations | nindent 4 }}
 spec:
   ingressClassName: {{ .Values.ingress.className }}
+
   {{- if .Values.tls.enabled }}
   tls:
     - hosts:
         - {{ .Values.global.domain }}
       secretName: {{ .Values.tls.secretName }}
   {{- end }}
+
   rules:
     - host: {{ .Values.global.domain }}
       http:
         paths:
+
           {{- if .Values.api.enabled }}
-          - path: {{ include "aks-3tier-poc.apiPath" . }}
-            pathType: ImplementationSpecific
+          - path: /api
+            pathType: Prefix
             backend:
               service:
                 name: {{ printf "%s-api" .Release.Name }}
                 port:
                   number: {{ .Values.api.service.port }}
           {{- end }}
+
           {{- if .Values.frontend.enabled }}
-          - path: {{ include "aks-3tier-poc.frontendPath" . }}
+          - path: /
             pathType: Prefix
             backend:
               service:

@@ -33,7 +33,7 @@ api:
 
   image:
     repository: acrsecure3tierv21789745065.azurecr.io/aks-3tier-api
-    tag: "1.0.0"
+    tag: "1.0.2"
     pullPolicy: IfNotPresent
 
   replicaCount: 2
@@ -91,8 +91,6 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
 
 tls:
   enabled: false
